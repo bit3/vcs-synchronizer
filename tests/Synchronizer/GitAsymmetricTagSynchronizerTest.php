@@ -14,11 +14,13 @@ namespace ContaoCommunityAlliance\BuildSystem\VcsSync\Test\Synchronizer;
 
 class GitAsymmetricTagSynchronizerTest extends AbstractGitVcsSynchronizerTest
 {
-    /*
     public function testSync()
     {
+        $this->markTestIncomplete();
+        /*
         $synchronizer = new GitAsymmetricTagSynchronizer($this->repository, ['first', 'second', 'third'], 'first');
+        $synchronizer->setLogger($this->logger);
         $synchronizer->sync();
+        */
     }
-    */
 }

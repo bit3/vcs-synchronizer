@@ -16,9 +16,10 @@ use ContaoCommunityAlliance\BuildSystem\VcsSync\Synchronizer\GitAsymmetricBranch
 
 class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 {
-    public function testAsymmetricSynchronizeBranchesWithFirst()
+    public function testSynchronizeWithFirstAsPrimary()
     {
         $synchronizer = new GitAsymmetricBranchSynchronizer($this->repository, ['first', 'second', 'third'], 'first');
+        $synchronizer->setLogger($this->logger);
         $synchronizer->sync();
 
         $log = file_get_contents($this->logPath);
@@ -147,9 +148,10 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
         }
     }
 
-    public function testAsymmetricSynchronizeBranchesWithSecond()
+    public function testSynchronizeWithSecondAsPrimary()
     {
-        $synchronizer = new GitAsymmetricBranchSynchronizer($this->repository, ['first', 'second', 'third'], 'first');
+        $synchronizer = new GitAsymmetricBranchSynchronizer($this->repository, ['first', 'second', 'third'], 'second');
+        $synchronizer->setLogger($this->logger);
         $synchronizer->sync();
 
         $log = file_get_contents($this->logPath);

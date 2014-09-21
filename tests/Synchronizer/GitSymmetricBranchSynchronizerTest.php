@@ -16,9 +16,10 @@ use ContaoCommunityAlliance\BuildSystem\VcsSync\Synchronizer\GitSymmetricBranchS
 
 class GitSymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 {
-    public function testSync()
+    public function testSynchronize()
     {
         $synchronizer = new GitSymmetricBranchSynchronizer($this->repository, ['first', 'second', 'third']);
+        $synchronizer->setLogger($this->logger);
         $synchronizer->sync();
 
         $log = file_get_contents($this->logPath);
