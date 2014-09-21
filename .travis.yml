@@ -7,5 +7,7 @@ php:
 
 install:
     - composer install --prefer-dist --dev
+    - git config --global user.email "phpunit@example.com"
+    - git config --global user.name "PHP Unit"
 
 script: ant -keep-going
