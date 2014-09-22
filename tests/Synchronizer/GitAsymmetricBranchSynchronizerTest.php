@@ -71,13 +71,12 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 
         $repository = $synchronizer->getRepository();
 
-        $firstRepositoriesRefs  = $repository->lsRemote()->getRefs('first');
-        $secondRepositoriesRefs = $repository->lsRemote()->getRefs('second');
-        $thirdRepositoriesRefs  = $repository->lsRemote()->getRefs('third');
+        $firstRepositoriesRefs  = $repository->lsRemote()->heads()->getRefs('first');
+        $secondRepositoriesRefs = $repository->lsRemote()->heads()->getRefs('second');
+        $thirdRepositoriesRefs  = $repository->lsRemote()->heads()->getRefs('third');
 
         $this->assertEquals(
             [
-                'HEAD',
                 'refs/heads/develop',
                 'refs/heads/foo',
                 'refs/heads/master',
@@ -89,7 +88,6 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 
         $this->assertEquals(
             [
-                'HEAD',
                 'refs/heads/develop',
                 'refs/heads/foo',
                 'refs/heads/master',
@@ -101,7 +99,6 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 
         $this->assertEquals(
             [
-                'HEAD',
                 'refs/heads/develop',
                 'refs/heads/foo',
                 'refs/heads/master',
@@ -201,13 +198,12 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 
         $repository = $synchronizer->getRepository();
 
-        $firstRepositoriesRefs  = $repository->lsRemote()->getRefs('first');
-        $secondRepositoriesRefs = $repository->lsRemote()->getRefs('second');
-        $thirdRepositoriesRefs  = $repository->lsRemote()->getRefs('third');
+        $firstRepositoriesRefs  = $repository->lsRemote()->heads()->getRefs('first');
+        $secondRepositoriesRefs = $repository->lsRemote()->heads()->getRefs('second');
+        $thirdRepositoriesRefs  = $repository->lsRemote()->heads()->getRefs('third');
 
         $this->assertEquals(
             [
-                'HEAD',
                 'refs/heads/bar',
                 'refs/heads/develop',
                 'refs/heads/master',
@@ -220,7 +216,6 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 
         $this->assertEquals(
             [
-                'HEAD',
                 'refs/heads/bar',
                 'refs/heads/develop',
                 'refs/heads/master',
@@ -233,7 +228,6 @@ class GitAsymmetricBranchSynchronizerTest extends AbstractGitVcsSynchronizerTest
 
         $this->assertEquals(
             [
-                'HEAD',
                 'refs/heads/bar',
                 'refs/heads/develop',
                 'refs/heads/master',

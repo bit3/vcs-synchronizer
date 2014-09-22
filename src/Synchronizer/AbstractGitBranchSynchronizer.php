@@ -16,15 +16,22 @@ use ContaoCommunityAlliance\BuildSystem\NoOpLogger;
 use ContaoCommunityAlliance\BuildSystem\Repository\GitRepository;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Abstract base class for the git branch synchronizers.
+ */
 abstract class AbstractGitBranchSynchronizer extends AbstractGitVcsSynchronizer
 {
     /**
-     * @var string[]
+     * The accepted branch names or patterns.
+     *
+     * @var array
      */
     protected $branches = [];
 
     /**
-     * @return \string[]
+     * Get the accepted branch names.
+     *
+     * @return array
      */
     public function getBranches()
     {
@@ -32,7 +39,9 @@ abstract class AbstractGitBranchSynchronizer extends AbstractGitVcsSynchronizer
     }
 
     /**
-     * @param \string[] $branches
+     * Set the accepted branch names.
+     *
+     * @param array $branches The accepted branch names or patterns.
      *
      * @return static
      */
@@ -42,6 +51,13 @@ abstract class AbstractGitBranchSynchronizer extends AbstractGitVcsSynchronizer
         return $this;
     }
 
+    /**
+     * Determine if the branch name is accepted.
+     *
+     * @param string $branch The branch name to check.
+     *
+     * @return bool
+     */
     protected function determineBranchIsAccepted($branch)
     {
         if (empty($this->branches) || in_array($branch, $this->branches)) {
@@ -55,5 +71,39 @@ abstract class AbstractGitBranchSynchronizer extends AbstractGitVcsSynchronizer
         }
 
         return false;
+    }
+
+    /**
+     * Generate a reference list of all branches.
+     *
+     * @return array
+     */
+    protected function buildBranchesList()
+    {
+        $refsPerRemote     = array();
+        $branchesPerRemote = array();
+
+        foreach ($this->remotes as $remote) {
+            $refsPerRemote[$remote] = $this->repository
+                ->lsRemote()
+                ->heads()
+                ->getRefs($remote);
+        }
+
+        foreach ($refsPerRemote as $remote => $refs) {
+            $branchesPerRemote[$remote] = [];
+
+            $this->fetchRefs($remote, $refs);
+
+            foreach ($refs as $ref => $hash) {
+                if (preg_match('~^refs/heads/(.*)$~', $ref, $matches)) {
+                    $name = $matches[1];
+
+                    $branchesPerRemote[$remote][$name] = $hash;
+                }
+            }
+        }
+
+        return $branchesPerRemote;
     }
 }

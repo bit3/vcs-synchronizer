@@ -12,16 +12,12 @@
 
 namespace ContaoCommunityAlliance\BuildSystem\VcsSync\Test\Synchronizer;
 
-use ContaoCommunityAlliance\BuildSystem\NoOpLogger;
 use ContaoCommunityAlliance\BuildSystem\Repository\GitRepository;
 use ContaoCommunityAlliance\BuildSystem\VcsSync\Synchronizer\GitAsymmetricBranchSynchronizer;
 use ContaoCommunityAlliance\BuildSystem\VcsSync\Synchronizer\GitAsymmetricTagSynchronizer;
 use ContaoCommunityAlliance\BuildSystem\VcsSync\Synchronizer\GitSymmetricBranchSynchronizer;
-use ContaoCommunityAlliance\BuildSystem\VcsSync\Synchronizer\GitVcsSynchronizer;
-use Monolog\Handler\BufferHandler;
 use Monolog\Handler\StreamHandler;
 use Monolog\Logger;
-use Psr\Log\LoggerInterface;
 use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Process\ProcessBuilder;
 
@@ -157,6 +153,14 @@ abstract class AbstractGitVcsSynchronizerTest extends \PHPUnit_Framework_TestCas
         $this->execute($path, 'git', 'commit', '-m', 'Foo commit.');
         $this->execute($path, 'git', 'push', 'origin', 'foo');
 
+        // create tag 1.0
+        $this->execute($path, 'git', 'tag', '1.0', 'master');
+        $this->execute($path, 'git', 'push', 'origin', '1.0');
+
+        // create tag 1.1
+        $this->execute($path, 'git', 'tag', '-m', 'Version 1.1', '1.1', 'stable');
+        $this->execute($path, 'git', 'push', 'origin', '1.1');
+
         // remote the first repository, stay with the bare repository
         $this->filesystem->remove($path);
     }
@@ -245,6 +249,18 @@ abstract class AbstractGitVcsSynchronizerTest extends \PHPUnit_Framework_TestCas
         $this->execute($path, 'git', 'commit', '-m', 'Bar commit.');
         $this->execute($path, 'git', 'push', 'origin', 'bar');
 
+        // fetch tag 1.0
+        $this->execute($path, 'git', 'fetch', 'file://' . $this->sourceFirstRepositoriesPath, 'refs/tags/1.0:refs/tags/1.0');
+        $this->execute($path, 'git', 'push', 'origin', '1.0');
+
+        // fetch tag 1.1
+        $this->execute($path, 'git', 'fetch', 'file://' . $this->sourceFirstRepositoriesPath, 'refs/tags/1.1:refs/tags/1.1');
+        $this->execute($path, 'git', 'push', 'origin', '1.1');
+
+        // create tag 1.2
+        $this->execute($path, 'git', 'tag', '-m', 'Version 1.2', '1.2', 'release');
+        $this->execute($path, 'git', 'push', 'origin', '1.2');
+
         // remote the second repository, stay with the bare repository
         $this->filesystem->remove($path);
     }
@@ -325,6 +341,10 @@ abstract class AbstractGitVcsSynchronizerTest extends \PHPUnit_Framework_TestCas
         $this->execute($path, 'git', 'commit', '-m', 'Zap commit.');
         $this->execute($path, 'git', 'push', 'origin', 'zap');
 
+        // create tag 1.2
+        $this->execute($path, 'git', 'tag', '-m', 'Version 1.2', '1.2', 'release');
+        $this->execute($path, 'git', 'push', 'origin', '1.2');
+
         // remote the third repository, stay with the bare repository
         $this->filesystem->remove($path);
     }
@@ -353,10 +373,9 @@ abstract class AbstractGitVcsSynchronizerTest extends \PHPUnit_Framework_TestCas
 
     public function tearDown()
     {
-        return;
-        $this->filesystem->remove($this->sourceFirstPath);
-        $this->filesystem->remove($this->sourceSecondPath);
-        $this->filesystem->remove($this->sourceThirdPath);
+        $this->filesystem->remove($this->sourceFirstRepositoriesPath);
+        $this->filesystem->remove($this->sourceSecondRepositoriesPath);
+        $this->filesystem->remove($this->sourceThirdRepositoriesPath);
         $this->filesystem->remove($this->sourceSynchronizedPath);
         $this->filesystem->remove($this->logPath);
 

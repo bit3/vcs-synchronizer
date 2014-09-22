@@ -16,23 +16,31 @@ use ContaoCommunityAlliance\BuildSystem\NoOpLogger;
 use ContaoCommunityAlliance\BuildSystem\Repository\GitRepository;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Abstract base class for git synchronizers.
+ */
 abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
 {
     /**
+     * The git repository.
+     *
      * @var GitRepository
      */
     protected $repository;
 
     /**
-     * @var string[]
+     * The remote names to synchronize.
+     *
+     * @var array
      */
     protected $remotes = [];
 
     /**
-     * @var string
+     * Create a new git synchronizer.
+     *
+     * @param GitRepository $repository The git repository.
+     * @param array         $remotes    The remote names to synchronize.
      */
-    protected $primaryRemote;
-
     public function __construct(GitRepository $repository, array $remotes)
     {
         parent::__construct();
@@ -41,6 +49,8 @@ abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
     }
 
     /**
+     * Get the git repository.
+     *
      * @return GitRepository
      */
     public function getRepository()
@@ -49,7 +59,9 @@ abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
     }
 
     /**
-     * @param GitRepository $repository
+     * Set the git repository.
+     *
+     * @param GitRepository $repository The git repository.
      *
      * @return static
      */
@@ -60,7 +72,9 @@ abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
     }
 
     /**
-     * @return \string[]
+     * Get the remote names.
+     *
+     * @return array
      */
     public function getRemotes()
     {
@@ -68,7 +82,9 @@ abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
     }
 
     /**
-     * @param \string[] $remotes
+     * Set the remote names.
+     *
+     * @param array $remotes The remote names.
      *
      * @return static
      */
@@ -79,95 +95,14 @@ abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
     }
 
     /**
-     * @return string
-     */
-    public function getPrimaryRemote()
-    {
-        return $this->primaryRemote;
-    }
-
-    /**
-     * @param string $primaryRemote
+     * Fetch given references from a remote.
      *
-     * @return static
+     * @param string $remote The remote name.
+     * @param array  $refs   The list of references.
+     *
+     * @return void
      */
-    public function setPrimaryRemote($primaryRemote)
-    {
-        $this->primaryRemote = empty($primaryRemote) ? null : (string) $primaryRemote;
-        return $this;
-    }
-
-    protected function buildBranchesList()
-    {
-        $refsPerRemote     = array();
-        $branchesPerRemote = array();
-
-        foreach ($this->remotes as $remote) {
-            $refsPerRemote[$remote] = $this->repository
-                ->lsRemote()
-                ->heads()
-                ->getRefs($remote);
-        }
-
-        foreach ($refsPerRemote as $remote => $refs) {
-            $branchesPerRemote[$remote] = [];
-
-            $this->fetchRefs($remote, $refs);
-
-            foreach ($refs as $ref => $hash) {
-                if (preg_match('~^refs/heads/(.*)$~', $ref, $matches)) {
-                    $name = $matches[1];
-
-                    $branchesPerRemote[$remote][$name] = $hash;
-                }
-            }
-        }
-
-        return $branchesPerRemote;
-    }
-
-    protected function buildTagsList()
-    {
-        $refsPerRemote = array();
-        $tagsPerRemote = array();
-
-        foreach ($this->remotes as $remote) {
-            $refsPerRemote[$remote] = $this->repository
-                ->lsRemote()
-                ->heads()
-                ->getRefs($remote);
-        }
-
-        foreach ($refsPerRemote as $remote => $refs) {
-            $tagsPerRemote[$remote]     = [];
-
-            $this->fetchRefs($remote, $refs);
-
-            foreach ($refs as $ref => $hash) {
-                if (preg_match('~^refs/tags/(.*)$~', $ref, $matches)) {
-                    $name = $matches[1];
-
-                    $tagsPerRemote[$remote][$name] = $hash;
-                }
-            }
-        }
-
-        return $tagsPerRemote;
-    }
-
-    protected function getRemotesWithoutPrimary()
-    {
-        $otherRemotes = array_merge($this->remotes);
-
-        if ($this->primaryRemote) {
-            $index = array_search($this->primaryRemote, $otherRemotes);
-            unset($otherRemotes[$index]);
-        }
-
-        return $otherRemotes;
-    }
-
-    protected function fetchRefs($remote, $refs)
+    protected function fetchRefs($remote, array $refs)
     {
         // use the remote ref names
         $refs = array_keys($refs);
@@ -185,6 +120,14 @@ abstract class AbstractGitVcsSynchronizer extends AbstractVcsSynchronizer
         );
     }
 
+    /**
+     * Count the commits between two commits/refs.
+     *
+     * @param string $left  The left commit/ref.
+     * @param string $right The right commit/ref.
+     *
+     * @return int
+     */
     protected function countCommits($left, $right)
     {
         $log   = $this->repository

@@ -16,19 +16,29 @@ use ContaoCommunityAlliance\BuildSystem\NoOpLogger;
 use ContaoCommunityAlliance\BuildSystem\Repository\GitRepository;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Abstract base class for vcs synchronizers.
+ */
 abstract class AbstractVcsSynchronizer
 {
     /**
+     * The logger.
+     *
      * @var LoggerInterface
      */
     protected $logger;
 
+    /**
+     * Create a new vcs logger.
+     */
     public function __construct()
     {
         $this->logger = new NoOpLogger();
     }
 
     /**
+     * Get the current logger.
+     *
      * @return LoggerInterface
      */
     public function getLogger()
@@ -37,7 +47,9 @@ abstract class AbstractVcsSynchronizer
     }
 
     /**
-     * @param LoggerInterface $logger
+     * Set the logger.
+     *
+     * @param LoggerInterface $logger The logger instance.
      *
      * @return static
      */

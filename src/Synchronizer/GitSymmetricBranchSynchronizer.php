@@ -16,9 +16,16 @@ use ContaoCommunityAlliance\BuildSystem\NoOpLogger;
 use ContaoCommunityAlliance\BuildSystem\Repository\GitRepository;
 use Psr\Log\LoggerInterface;
 
+/**
+ * Symmetric git branch synchronizer.
+ */
 class GitSymmetricBranchSynchronizer extends AbstractGitBranchSynchronizer
 {
-
+    /**
+     * Synchronize the branches of the repository.
+     *
+     * @return void
+     */
     public function sync()
     {
         $branchesPerRemote = $this->buildBranchesList();
@@ -79,6 +86,14 @@ class GitSymmetricBranchSynchronizer extends AbstractGitBranchSynchronizer
         }
     }
 
+    /**
+     * Generate a list of all heads for a specific branch, over all remotes.
+     *
+     * @param array  $branchesPerRemote List of all branches in all remotes.
+     * @param string $branch            The branch to build the heads for.
+     *
+     * @return array
+     */
     protected function buildHeadsList($branchesPerRemote, $branch)
     {
         $heads = [];
@@ -94,6 +109,15 @@ class GitSymmetricBranchSynchronizer extends AbstractGitBranchSynchronizer
         return $heads;
     }
 
+    /**
+     * Callculate all distances for a specific branch over all remotes.
+     *
+     * @param string $branch    The branch name.
+     * @param array  $heads     The heads of this branch in all remotes.
+     * @param array  $distances The distances between the remotes.
+     *
+     * @return bool Return false if a conflict was detected.
+     */
     protected function calculateDistances($branch, $heads, array &$distances)
     {
         $remotes  = array_keys($heads);
@@ -137,6 +161,19 @@ class GitSymmetricBranchSynchronizer extends AbstractGitBranchSynchronizer
         return $conflict;
     }
 
+    /**
+     * Calculate the distance for a specific branch between two remotes.
+     *
+     * @param string $branch      The branch name.
+     * @param string $leftRemote  The left remote name.
+     * @param string $leftHead    The left remotes branch head.
+     * @param string $rightRemote The right remote name.
+     * @param string $rightHead   The right remotes branch head.
+     * @param array  $distances   The distances between the remotes.
+     * @param bool   $conflict    The conflict status.
+     *
+     * @return void
+     */
     protected function calculateDistance(
         $branch,
         $leftRemote,
