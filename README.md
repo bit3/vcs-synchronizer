@@ -48,7 +48,9 @@ Symmetric branch synchronizer
 
 **CLI usage**
 
+```bash
 ./bin/git-branches-symmetric-sync -b github -b bitbucket /path/to/repository
+```
 
 **PHP usage**
 
@@ -70,7 +72,9 @@ Asymmetric branch synchronizer
 
 **CLI usage**
 
+```bash
 ./bin/git-branches-asymmetric-sync -b github -b bitbucket -p github /path/to/repository
+```
 
 **PHP usage**
 
@@ -94,7 +98,9 @@ Asymmetric tag synchronizer
 
 **CLI usage**
 
+```bash
 ./bin/git-tags-asymmetric-sync -b github -b bitbucket -p github /path/to/repository
+```
 
 **PHP usage**
 
