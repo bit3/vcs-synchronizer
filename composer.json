@@ -28,6 +28,11 @@
             "ContaoCommunityAlliance\\BuildSystem\\VcsSync\\Test\\": "tests"
         }
     },
+    "bin": [
+        "bin/git-branches-asymmetric-sync",
+        "bin/git-branches-symmetric-sync",
+        "bin/git-tags-asymmetric-sync"
+    ],
     "extra": {
         "branch-alias": {
             "dev-develop": "1.0.x-dev"
